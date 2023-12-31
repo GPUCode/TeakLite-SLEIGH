@@ -743,23 +743,34 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 :tst4b    ArRn2_2,ArStep2_0,Ax_4    is ArRn2_2 & ArStep2_0 & Ax_4 & op_0515=0x23C unimpl
 
 # 0xF000 0x0FFF    tstb At<MemImm8, 0>,At<Imm4, 8>,
-:tstb    MemImm8_0,Imm4_8    is MemImm8_0 & Imm4_8 & op_1215=0xF unimpl
+:tstb    MemImm8_0,Imm4_8    is MemImm8_0 & Imm4_8 & op_1215=0xF
+{
+    fz = (MemImm8_0 >> Imm4_8) & 1;
+}
 
 # 0x9020 0x0F1F    tstb At<Rn, 0>,At<StepZIDS, 3>,At<Imm4, 8>,
-:tstb    Rn_0,StepZIDS_3,Imm4_8    is Rn_0 & StepZIDS_3 & Imm4_8 & op_0507=0x1 & op_1215=0x9 unimpl
+:tstb    RnAddressAndModify_0,Imm4_8    is RnAddressAndModify_0 & Imm4_8 & op_0507=0x1 & op_1215=0x9
+{
+    fz = (RnAddressAndModify_0 >> Imm4_8) & 1;
+}
 
 # 0x9000 0x0F1F    tstb At<Register, 0>,At<Imm4, 8>,
 :tstb    Register_0,Imm4_8    is Register_0 & Imm4_8 & op_0507=0x0 & op_1215=0x9
 {
-    local value:2 = Register_0;
-    fz = (value >> Imm4_8) & 1;
+    fz = (Register_0 >> Imm4_8) & 1;
 }
 
 # 0x9018 0x0F00    tstb_r6 At<Imm4, 8>,
-:tstb_r6    Imm4_8    is Imm4_8 & op_0007=0x18 & op_1215=0x9 unimpl
+:tstb_r6    Imm4_8    is Imm4_8 & op_0007=0x18 & op_1215=0x9
+{
+    fz = (r6 >> Imm4_8) & 1;
+}
 
 # 0x0028 0xFFFF0007    tstb At<SttMod, 0>,At<Imm16, 16>,
-:tstb    SttMod_0,Imm16_16    is SttMod_0 & op_0315=0x5 ; Imm16_16 unimpl
+:tstb    SttMod_0,Imm16_16    is SttMod_0 & op_0315=0x5 ; Imm16_16
+{
+    fz = (SttMod_0 >> Imm16_16) & 1;
+}
 
 # 0x6770 0x100F    and_ At<Ab, 2>,At<Ab, 0>,At<Ax, 12>,
 :and_    Ab_2,Ab_0,Ax_12    is Ab_2 & Ab_0 & Ax_12 & op_0411=0x77 & op_1315=0x3 unimpl
