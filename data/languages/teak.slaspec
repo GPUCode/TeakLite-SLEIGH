@@ -47,10 +47,28 @@ define register offset=0x90 size=2  [ ext0 ext1 ext2 ext3 ];
 define register offset=0x100 size=2 [ st0 st1 st2 icr ];
 #  TL II
 define register offset=0x110 size=2 [ stt0 stt1 stt2 mod0 mod1 mod2 mod3 ];
+#define bitrange fr=stt1[4,1]
+#                pe0=stt1[14,1]
+#                pe1=stt1[15,1]
+#;
 
 # Address conf
 define register offset=0x120 size=2 [ ar0 ar1 arp0 arp1 arp2 arp3 ];
-#todo define bitrange ...
+#define bitrange arstep1=ar0[0,3]
+#                aroffset1=ar0[3,2]
+#                arstep0=ar0[5,3]
+#                aroffset0=ar0[8,2]
+#                arrn1=ar0[10,3]
+#                arrn0=ar0[13,3]
+#
+#                arstep3=ar1[0,3]
+#                aroffset3=ar1[3,2]
+#                arstep2=ar1[5,3]
+#                aroffset2=ar1[8,2]
+#                arrn3=ar1[10,3]
+#                arrn2=ar1[13,3]
+#;
+
 
 define register offset=0x130 size=2 [ cfgi cfgj stepi0 stepj0 ];
 #todo define bitrange ...
@@ -313,10 +331,11 @@ attach variables [ Ablh_10 Ablh_9 ] [ b0l b0h b1l b1h a0l a0h a1l a1h ];
 attach variables [ ArArpSttMod_0 ArArpSttMod_8 ] [ ar0 ar1 arp0 arp1 arp2 arp3 _ _ stt0 stt1 stt2 _ mod0 mod1 mod2 mod3 ];
 attach variables [ ArArp_0 ArArp_8 ] [ ar0 ar1 arp0 arp1 arp2 arp3 _ _ ];
 # attach variables [ ArRn1_1 ArRn1_3 ArRn1_4 ArRn1_8 ]
-# attach variables [ ArRn2_0 ArRn2_10 ArRn2_2 ArRn2_3 ArRn2_4 ArRn2_7 ArRn2_8 ]
+#attach variables [ ArRn2_0 ArRn2_10 ArRn2_2 ArRn2_3 ArRn2_4 ArRn2_7 ArRn2_8 ] [ ar1 ar1 _ _ ];
 # attach variables [ ArStep1Alt_3 ]
 # attach variables [ ArStep1_0 ArStep1_2 ArStep1_3 ArStep1_5 ArStep1_6 ]
-# attach variables [ ArStep2_0 ArStep2_2 ArStep2_5 ArStep2_8 ]
+attach variables [ ArStep2_0 ArStep2_2 ArStep2_5 ArStep2_8 ] [ ar1 ar1 _ _ ];
+#attach variables [ ArStep2_0 ArStep2_2 ArStep2_5 ArStep2_8 ] [ aoffset2 aoffset3 ];
 attach variables [ Ar_0 Ar_2 ] [ ar0 ar1 ];
 # attach variables [ ArpRn1_0 ArpRn1_2 ArpRn1_3 ArpRn1_4 ArpRn1_5 ArpRn1_8 ArpRn1_9 ]
 # attach variables [ ArpRn2_10 ArpRn2_4 ArpRn2_5 ArpRn2_8 ]
@@ -356,7 +375,7 @@ attach variables [ R0123_0 R0123_5 ] [ r0 r1 r2 r3 ];
 attach variables [ R45_2 ] [ r4 r5 ];
 attach variables [ Register_0004 Register_0509 ] [ r0 r1 r2 r3 r4 r5 r7 y0
                                              st0 st1 st2
-                                             _ # p0h
+                                             p0h
                                              _ # pc
                                              sp
                                              cfgi cfgj
@@ -365,6 +384,7 @@ attach variables [ Register_0004 Register_0509 ] [ r0 r1 r2 r3 r4 r5 r7 y0
                                              _ _ # a0 a1 
                                              a0l a1l a0h a1h
                                              lc sv ];
+
 # attach variables [ RelAddr7_4 ]
 attach variables [ RnOld_10 RnOld_9 ] [ r0 r1 r2 r3 r4 r5 r7 y0 ];
 attach variables [ Rn_0 ] [ r0 r1 r2 r3 r4 r5 r6 r7 ];
@@ -480,7 +500,7 @@ Register_5: Register_0509    is Register_0509 { export Register_0509; }
 # Placeholders
 Register_5: p0    is p0 & Register_0509=0x0B unimpl
 Register_5: pc    is pc & Register_0509=0x0C unimpl
-Register_5: Ax_5    is Ax_5 & (Register_0509=0x18 | Register_0509=0x19) unimpl
+RegisterAb_5: Ab_5    is Ab_5 & (Register_0509=0x18 | Register_0509=0x19) { export Ab_5; }
 
 RegToBus16SatAblh_9: Ablh_9   is Ablh_9 
 {
@@ -590,6 +610,10 @@ ProductToBus40_1: ProductToBus40p1 is ProductToBus40p1 & Px_1=0x1
 {
     export ProductToBus40p1;
 }
+ProductToBus40_02: ProductToBus40p0 is ProductToBus40p0 & Register_0004=0xB
+{
+    export ProductToBus40p0;
+}
 
 Cond_0: ""       is Cond_0003=0x0 { local tmp:1 = (1); export tmp; } # Always
 Cond_0: "eq"     is Cond_0003=0x1 { local tmp:1 = (Z==1); export tmp; } # Equal to zero
@@ -612,6 +636,36 @@ Cond_0: "iu1"    is Cond_0003=0xF { local tmp:1 = (IU1==1); export tmp; } # Inpu
 define pcodeop debug_trap;
 
 # MACROs
+macro SaturateAcc(a, out)
+{
+    if (SAT == 1 || a == sext(a[0,32])) goto <end>;
+    LM = 1;
+    out = ~sext(a[39,1]);
+    out[15,1] = a[39,1];
+    <end>
+}
+
+macro Exp(value, out)
+{
+    sign = (value >> 39) & 1;
+    bit = 38;
+    count = 0;
+    <start>
+    if (((value >> bit) & 1) != sign) goto <end>;
+    count = count + 1;
+    if (bit == 0) goto <end>;
+    bit = bit - 1;
+    goto <start>;
+    <end>
+    out = count - 8;
+}
+
+macro RnAndModify(Rn, step, dmod)
+{
+    value:2 = Rn; # assert(sizeof(Rn) == 2)
+    # todo Check epi/epj
+}
+
 macro Push(value)
 {
     tmp:2 = value; # assert(sizeof(value) == 2)
@@ -704,6 +758,11 @@ macro RegFromBus16Ab(Ab, value)
 }
 
 macro StepAddress(unit, address, step, dmod)
+{
+    #todo
+}
+
+macro OffsetAddress(unit, address, offset, dmod)
 {
     #todo
 }
@@ -814,3 +873,4 @@ macro Sub(a, b)
 @include "alb.sinc"
 @include "alm_alu.sinc"
 @include "moda.sinc"
+@include "mul.sinc"

@@ -1,0 +1,54 @@
+macro MulGenericMpy()
+{
+    x:4 = zext(x0);
+    y:4 = zext(y0);
+    if (HWM != 1 & HWM != 3) goto <start>;
+    y = y >> 8;
+    goto <start>;
+    if (HWM != 2) goto <start>;
+    y = y & 0xFF;
+    <start>
+    x = sext(x);
+    y = sext(y);
+    p0 = x * y;
+    stt1[14,1] = p0[31,1]; # pe0 = p0[31,1];
+}
+
+macro MulGenericMpysu()
+{
+    x:4 = zext(x0);
+    y:4 = zext(y0);
+    if (HWM != 1 & HWM != 3) goto <start>;
+    y = y >> 8;
+    goto <start>;
+    if (HWM != 2) goto <start>;
+    y = y & 0xFF;
+    <start>
+    y = sext(y);
+    p0 = x * y;
+    stt1[14,1] = p0[31,1]; # pe0 = p0[31,1];
+}
+
+# 0x8000 0xFFFF0F1F    mul At<Mul3, 8>,At<Rn, 0>,At<StepZIDS, 3>,At<Imm16, 16>,At<Ax, 11>,
+:mul    Mul3_8,Rn_0,StepZIDS_3,Imm16_16,Ax_11    is Mul3_8 & Rn_0 & StepZIDS_3 & Ax_11 & op_0507=0x0 & op_1215=0x8 ; Imm16_16 unimpl
+
+# 0x8020 0x0F1F    mul_y0 At<Mul3, 8>,At<Rn, 0>,At<StepZIDS, 3>,At<Ax, 11>,
+:mul_y0    Mul3_8,Rn_0,StepZIDS_3,Ax_11    is Mul3_8 & Rn_0 & StepZIDS_3 & Ax_11 & op_0507=0x1 & op_1215=0x8 unimpl
+
+# 0x8040 0x0F1F    mul_y0 At<Mul3, 8>,At<Register, 0>,At<Ax, 11>,
+with : op_0507=0x2 & op_1215=0x8 {
+    :mul_y0_mpy    Register_0,Ax_11    is Register_0 & Ax_11
+    {
+        local value:2 = Register_0;
+        MulGenericMpy();
+    }
+}
+
+# 0xD000 0x0F7F    mul At<Mul3, 8>,At<R45, 2>,At<StepZIDS, 5>,At<R0123, 0>,At<StepZIDS, 3>,At<Ax, 11>,
+:mul    Mul3_8,R45_2,StepZIDS_5,R0123_0,StepZIDS_3,Ax_11    is Mul3_8 & R45_2 & StepZIDS_5 & R0123_0 & StepZIDS_3 & Ax_11 & op_0707=0x0 & op_1215=0xD unimpl
+
+# 0x5EA0 0x000F    mul_y0_r6 At<Mul3, 1>,At<Ax, 0>,
+:mul_y0_r6    Mul3_1,Ax_0    is Mul3_1 & Ax_0 & op_0415=0x5EA unimpl
+
+# 0xE000 0x0EFF    mul_y0 At<Mul2, 9>,At<MemImm8, 0>,At<Ax, 11>,
+:mul_y0    Mul2_9,MemImm8_0,Ax_11    is Mul2_9 & MemImm8_0 & Ax_11 & op_0808=0x0 & op_1215=0xE unimpl

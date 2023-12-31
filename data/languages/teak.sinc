@@ -152,13 +152,22 @@ with : op_0415=0x498 {
 :trap        is op_0015=0x20 { debug_trap(); }
 
 # 0xD291 0x0C60    or_ At<Ab, 10>,At<Ax, 6>,At<Ax, 5>,
-:or_    Ab_10,Ax_6,Ax_5    is Ab_10 & Ax_6 & Ax_5 & op_0004=0x11 & op_0709=0x5 & op_1215=0xD unimpl
+:or_    Ab_10,Ax_6,Ax_5    is Ab_10 & Ax_6 & Ax_5 & op_0004=0x11 & op_0709=0x5 & op_1215=0xD
+{
+    SetAccAndFlag(Ax_5, Ab_10 | Ax_6);
+}
 
 # 0xD4A4 0x0103    or_ At<Ax, 8>,At<Bx, 1>,At<Ax, 0>,
-:or_    Ax_8,Bx_1,Ax_0    is Ax_8 & Bx_1 & Ax_0 & op_0207=0x29 & op_0915=0x6A unimpl
+:or_    Ax_8,Bx_1,Ax_0    is Ax_8 & Bx_1 & Ax_0 & op_0207=0x29 & op_0915=0x6A
+{
+    SetAccAndFlag(Ax_0, Ax_8 | Bx_1);
+}
 
 # 0xD3C4 0x0403    or_ At<Bx, 10>,At<Bx, 1>,At<Ax, 0>,
-:or_    Bx_10,Bx_1,Ax_0    is Bx_10 & Bx_1 & Ax_0 & op_0209=0xF1 & op_1115=0x1A unimpl
+:or_    Bx_10,Bx_1,Ax_0    is Bx_10 & Bx_1 & Ax_0 & op_0209=0xF1 & op_1115=0x1A
+{
+    SetAccAndFlag(Ax_0, Bx_10 | Bx_1);
+}
 
 # 0xD2DA 0x0C01    add At<Ab, 10>,At<Bx, 0>,
 :add    Ab_10,Bx_0    is Ab_10 & Bx_0 & op_0109=0x16D & op_1215=0xD
@@ -296,24 +305,6 @@ with : op_0415=0x498 {
 # 0x5E30 0x010F    add_sub_j_mov_i At<ArpRn1, 8>,At<ArpStep1, 0>,At<ArpStep1, 1>,At<Ab, 2>,
 :add_sub_j_mov_i    ArpRn1_8,ArpStep1_0,ArpStep1_1,Ab_2    is ArpRn1_8 & ArpStep1_0 & ArpStep1_1 & Ab_2 & op_0407=0x3 & op_0915=0x2F unimpl
 
-# 0x8000 0xFFFF0F1F    mul At<Mul3, 8>,At<Rn, 0>,At<StepZIDS, 3>,At<Imm16, 16>,At<Ax, 11>,
-:mul    Mul3_8,Rn_0,StepZIDS_3,Imm16_16,Ax_11    is Mul3_8 & Rn_0 & StepZIDS_3 & Ax_11 & op_0507=0x0 & op_1215=0x8 ; Imm16_16 unimpl
-
-# 0x8020 0x0F1F    mul_y0 At<Mul3, 8>,At<Rn, 0>,At<StepZIDS, 3>,At<Ax, 11>,
-:mul_y0    Mul3_8,Rn_0,StepZIDS_3,Ax_11    is Mul3_8 & Rn_0 & StepZIDS_3 & Ax_11 & op_0507=0x1 & op_1215=0x8 unimpl
-
-# 0x8040 0x0F1F    mul_y0 At<Mul3, 8>,At<Register, 0>,At<Ax, 11>,
-:mul_y0    Mul3_8,Register_0,Ax_11    is Mul3_8 & Register_0 & Ax_11 & op_0507=0x2 & op_1215=0x8 unimpl
-
-# 0xD000 0x0F7F    mul At<Mul3, 8>,At<R45, 2>,At<StepZIDS, 5>,At<R0123, 0>,At<StepZIDS, 3>,At<Ax, 11>,
-:mul    Mul3_8,R45_2,StepZIDS_5,R0123_0,StepZIDS_3,Ax_11    is Mul3_8 & R45_2 & StepZIDS_5 & R0123_0 & StepZIDS_3 & Ax_11 & op_0707=0x0 & op_1215=0xD unimpl
-
-# 0x5EA0 0x000F    mul_y0_r6 At<Mul3, 1>,At<Ax, 0>,
-:mul_y0_r6    Mul3_1,Ax_0    is Mul3_1 & Ax_0 & op_0415=0x5EA unimpl
-
-# 0xE000 0x0EFF    mul_y0 At<Mul2, 9>,At<MemImm8, 0>,At<Ax, 11>,
-:mul_y0    Mul2_9,MemImm8_0,Ax_11    is Mul2_9 & MemImm8_0 & Ax_11 & op_0808=0x0 & op_1215=0xE unimpl
-
 # 0x0800 0x00FF    mpyi At<Imm8s, 0>,
 :mpyi    Imm8s_0    is Imm8s_0 & op_0815=0x8 unimpl
 
@@ -438,10 +429,16 @@ with : op_0415=0x498 {
 }
 
 # 0xD380 0x0000    cntx_s 
-:cntx_s        is op_0015=0xD380 unimpl
+:cntx_s        is op_0015=0xD380
+{
+
+}
 
 # 0xD390 0x0000    cntx_r 
-:cntx_r        is op_0015=0xD390 unimpl
+:cntx_r        is op_0015=0xD390
+{
+
+}
 
 # 0x4580 0x000F    ret At<Cond, 0>,
 :ret    Cond_0    is Cond_0 & op_0415=0x458 
@@ -583,7 +580,18 @@ with: op_0515=0x2F2
 }
 
 # 0x4384 0x0043    pusha At<Ax, 6>,Unused<0>,Unused<1>,
-:pusha    Ax_6    is Ax_6 & Unused_0 & Unused_1 & op_0205=0x1 & op_0715=0x87 unimpl
+:pusha    Ax_6    is Ax_6 & Unused_0 & Unused_1 & op_0205=0x1 & op_0715=0x87
+{
+    local a_sat:5 = Ax_6;
+    SaturateAcc(Ax_6, a_sat);
+    value = a_sat & 0xFFFFFFFF;
+    h = value >> 16;
+    l = value & 0xFFFF;
+    sp = sp - 1;
+    *[DATA]:2 sp = l[0,16];
+    sp = sp - 1;
+    *[DATA]:2 sp = h[0,16];
+}
 
 # 0xD788 0x0003    pusha At<Bx, 1>,Unused<0>,
 :pusha    Bx_1    is Bx_1 & Unused_0 & op_0215=0x35E2 unimpl
@@ -683,7 +691,17 @@ with: op_0515=0x2F3
 }
 
 # 0x47B0 0x0003    popa At<Ab, 0>,
-:popa    Ab_0    is Ab_0 & op_0215=0x11EC unimpl
+:popa    Ab_0    is Ab_0 & op_0215=0x11EC
+{
+    tmp:5 = Ab_0; # assert(sizeof(Ab_0) == 5)
+
+    l:5 = zext(*[DATA]:2 sp);
+    sp = sp + 1;
+    h:5 = zext(*[DATA]:2 sp);
+    sp = sp + 1;
+    value:5 = (h << 16) | l;
+    SetAccAndFlag(Ab_0, value);
+}
 
 # 0x0C00 0x00FF    rep At<Imm8, 0>,
 :rep    Imm8_0    is Imm8_0 & op_0815=0xC unimpl
@@ -695,7 +713,11 @@ with: op_0515=0x2F3
 :rep_r6        is Unused_0 & op_0115=0x1 unimpl
 
 # 0xD280 0x0C6F    shfc At<Ab, 10>,At<Ab, 5>,At<Cond, 0>,
-:shfc    Ab_10,Ab_5,Cond_0    is Ab_10 & Ab_5 & Cond_0 & op_0404=0x0 & op_0709=0x5 & op_1215=0xD unimpl
+:shfc    Ab_10,Ab_5,Cond_0    is Ab_10 & Ab_5 & Cond_0 & op_0404=0x0 & op_0709=0x5 & op_1215=0xD
+{
+    if (!Cond_0) goto inst_next;
+    ShiftBus40Left(Ab_10, sv, Ab_5);
+}
 
 # 0x9240 0x0DBF    shfi At<Ab, 10>,At<Ab, 7>,At<Imm6s, 0>,
 with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
@@ -727,7 +749,11 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 :tstb    Rn_0,StepZIDS_3,Imm4_8    is Rn_0 & StepZIDS_3 & Imm4_8 & op_0507=0x1 & op_1215=0x9 unimpl
 
 # 0x9000 0x0F1F    tstb At<Register, 0>,At<Imm4, 8>,
-:tstb    Register_0,Imm4_8    is Register_0 & Imm4_8 & op_0507=0x0 & op_1215=0x9 unimpl
+:tstb    Register_0,Imm4_8    is Register_0 & Imm4_8 & op_0507=0x0 & op_1215=0x9
+{
+    local value:2 = Register_0;
+    fz = (value >> Imm4_8) & 1;
+}
 
 # 0x9018 0x0F00    tstb_r6 At<Imm4, 8>,
 :tstb_r6    Imm4_8    is Imm4_8 & op_0007=0x18 & op_1215=0x9 unimpl
@@ -739,13 +765,22 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 :and_    Ab_2,Ab_0,Ax_12    is Ab_2 & Ab_0 & Ax_12 & op_0411=0x77 & op_1315=0x3 unimpl
 
 # 0x43C0 0x0000    dint 
-:dint        is op_0015=0x43C0 unimpl
+:dint        is op_0015=0x43C0
+{
+    IE = 0;
+}
 
 # 0x4380 0x0000    eint 
-:eint        is op_0015=0x4380 unimpl
+:eint        is op_0015=0x4380
+{
+    IE = 1;
+}
 
 # 0x9460 0x0001    exp At<Bx, 0>,
-:exp    Bx_0    is Bx_0 & op_0115=0x4A30 unimpl
+:exp    Bx_0    is Bx_0 & op_0115=0x4A30
+{
+    Exp(Bx_0, sv);
+}
 
 # 0x9060 0x0101    exp At<Bx, 0>,At<Ax, 8>,
 :exp    Bx_0,Ax_8    is Bx_0 & Ax_8 & op_0107=0x30 & op_0915=0x48 unimpl
@@ -757,7 +792,14 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 :exp    Rn_0,StepZIDS_3,Ax_8    is Rn_0 & StepZIDS_3 & Ax_8 & op_0507=0x2 & op_0915=0x4C unimpl
 
 # 0x9440 0x001F    exp At<Register, 0>,
-:exp    Register_0    is Register_0 & op_0515=0x4A2 unimpl
+with : op_0515=0x4A2 {
+    :exp    Register_0    is Register_0 unimpl
+
+    :exp    Ax_0          is Ax_0 & (Register_0004=0x18 | Register_0004=0x19)
+    {
+        Exp(Ax_0, sv);
+    }
+}
 
 # 0x9040 0x011F    exp At<Register, 0>,At<Ax, 8>,
 :exp    Register_0,Ax_8    is Register_0 & Ax_8 & op_0507=0x2 & op_0915=0x48 unimpl
@@ -769,7 +811,11 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 :exp_r6    Ax_4    is Ax_4 & op_0003=0x2 & op_0515=0x69C unimpl
 
 # 0x0080 0x001F    modr At<Rn, 0>,At<StepZIDS, 3>,
-:modr    Rn_0,StepZIDS_3    is Rn_0 & StepZIDS_3 & op_0515=0x4 unimpl
+:modr    RnAndModify_0    is RnAndModify_0 & op_0515=0x4
+{
+    build RnAndModify_0;
+    R = RnAndModify_0 == 0;
+}
 
 # 0x00A0 0x001F    modr_dmod At<Rn, 0>,At<StepZIDS, 3>,
 :modr_dmod    Rn_0,StepZIDS_3    is Rn_0 & StepZIDS_3 & op_0515=0x5 unimpl
@@ -928,7 +974,10 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 :mov_ext3    Imm8s_0    is Imm8s_0 & op_0815=0x3D unimpl
 
 # 0x2300 0x1CFF    mov At<Imm8s, 0>,At<RnOld, 10>,
-:mov    Imm8s_0,RnOld_10    is Imm8s_0 & RnOld_10 & op_0809=0x3 & op_1315=0x1 unimpl
+:mov    Imm8s_0,RnOld_10    is Imm8s_0 & RnOld_10 & op_0809=0x3 & op_1315=0x1
+{
+    RnOld_10 = Imm8s_0;
+}
 
 # 0x0500 0x00FF    mov_sv At<Imm8s, 0>,
 :mov_sv    Imm8s_0    is Imm8s_0 & op_0815=0x5 unimpl
@@ -951,7 +1000,14 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 :mov    Rn_0,StepZIDS_3,Bx_8    is Rn_0 & StepZIDS_3 & Bx_8 & op_0507=0x6 & op_0915=0x4C unimpl
 
 # 0x1C00 0x03FF    mov At<Rn, 0>,At<StepZIDS, 3>,At<Register, 5>,
-:mov    Rn_0,StepZIDS_3,Register_5    is Rn_0 & StepZIDS_3 & Register_5 & op_1015=0x7 unimpl
+:mov    RnAddressAndModify_0,StepZIDS_3,Register_5    is RnAddressAndModify_0 & StepZIDS_3 & Register_5 & op_1015=0x7
+{
+    #u16 address = RnAddressAndModify(a.Index(), as.GetName());
+    #u16 value = mem.DataRead(address);
+    #RegFromBus16(b.GetName(), value);
+    # todo handle more cases
+    Register_5 = RnAddressAndModify_0;
+}
 
 # 0x47E0 0x001F    mov_memsp_to At<Register, 0>,
 :mov_memsp_to    Register_0    is Register_0 & op_0515=0x23F unimpl
@@ -977,7 +1033,22 @@ with :op_0606=0x1 & op_0909=0x1 & op_1215=0x9
 # 0x5800 0x03FF    mov At<Register, 0>,At<Register, 5>,
 with: op_1015=0x16 
 {
-    :mov    Register_0,Register_5    is Register_0 & Register_5 unimpl
+    # todo Handle more cases
+    :mov    Register_0,Register_5    is Register_0 & Register_5
+    {
+        Register_5 = Register_0;
+    }
+
+    :mov    Register_0,RegisterAb_5     is Register_0 & RegisterAb_5
+    {
+        SatAndSetAccAndFlag(RegisterAb_5, sext(Register_0[0,16]));
+    }
+
+    :mov    ProductToBus40_02,Register_5   is ProductToBus40_02 & Register_5
+    {
+        local tmp = (ProductToBus40_02:5 >> 16) & 0xFFFF;
+        Register_5 = tmp:2;
+    }
 
     :mov    RegToBus16Sat_0,Register_5    is RegToBus16Sat_0 & Register_5 
     {
@@ -1001,7 +1072,10 @@ with: op_1015=0x16
 :mov_y1_to    Ab_10    is Ab_10 & op_0009=0x299 & op_1215=0xD unimpl
 
 # 0x0008 0xFFFF0007    mov At<Imm16, 16>,At<ArArp, 0>,
-:mov    Imm16_16,ArArp_0    is ArArp_0 & op_0315=0x1 ; Imm16_16 unimpl
+:mov    Imm16_16,ArArp_0    is ArArp_0 & op_0315=0x1 ; Imm16_16
+{
+    ArArp_0 = Imm16_16;
+}
 
 # 0x0023 0xFFFF0000    mov_r6 At<Imm16, 16>,
 :mov_r6    Imm16_16    is op_0015=0x23 ; Imm16_16 unimpl
@@ -1010,13 +1084,22 @@ with: op_1015=0x16
 :mov_repc    Imm16_16    is op_0015=0x1 ; Imm16_16 unimpl
 
 # 0x8971 0xFFFF0000    mov_stepi0 At<Imm16, 16>,
-:mov_stepi0    Imm16_16    is op_0015=0x8971 ; Imm16_16 unimpl
+:mov_stepi0    Imm16_16    is op_0015=0x8971 ; Imm16_16
+{
+    stepi0 = Imm16_16;
+}
 
 # 0x8979 0xFFFF0000    mov_stepj0 At<Imm16, 16>,
-:mov_stepj0    Imm16_16    is op_0015=0x8979 ; Imm16_16 unimpl
+:mov_stepj0    Imm16_16    is op_0015=0x8979 ; Imm16_16
+{
+    stepj0 = Imm16_16;
+}
 
 # 0x0030 0xFFFF0007    mov At<Imm16, 16>,At<SttMod, 0>,
-:mov    Imm16_16,SttMod_0    is SttMod_0 & op_0315=0x6 ; Imm16_16 unimpl
+:mov    Imm16_16,SttMod_0    is SttMod_0 & op_0315=0x6 ; Imm16_16
+{
+    SttMod_0 = Imm16_16;
+}
 
 # 0x5DD0 0x000F    mov_prpage At<Imm4, 0>,
 :mov_prpage    Imm4_0    is Imm4_0 & op_0415=0x5DD unimpl
@@ -1103,10 +1186,16 @@ with: op_1015=0x16
 :mov    MemR7Imm16_16,ArArpSttMod_0    is ArArpSttMod_0 & op_0415=0x4D9 ; MemR7Imm16_16 unimpl
 
 # 0x886B 0x0100    mov_pc At<Ax, 8>,
-:mov_pc    Ax_8    is Ax_8 & op_0007=0x6B & op_0915=0x44 unimpl
+:mov_pc    Ax_8    is Ax_8 & op_0007=0x6B & op_0915=0x44
+{
+    pc = Ax_8[0,18];
+}
 
 # 0x8863 0x0100    mov_pc At<Bx, 8>,
-:mov_pc    Bx_8    is Bx_8 & op_0007=0x63 & op_0915=0x44 unimpl
+:mov_pc    Bx_8    is Bx_8 & op_0007=0x63 & op_0915=0x44
+{
+    pc = Bx_8[0,18];
+}
 
 # 0x8A73 0x0008    mov_mixp_to At<Bx, 3>,
 :mov_mixp_to    Bx_3    is Bx_3 & op_0002=0x3 & op_0415=0x8A7 unimpl
@@ -1151,10 +1240,18 @@ with: op_1015=0x16
 :mov_r6_mixp        is op_0015=0x43C1 unimpl
 
 # 0x5F00 0x001F    mov_r6_to At<Register, 0>,
-:mov_r6_to    Register_0    is Register_0 & op_0515=0x2F8 unimpl
+:mov_r6_to    Register_0    is Register_0 & op_0515=0x2F8
+{
+    # todo Handle other registers
+    Register_0 = r6;
+}
 
 # 0x5F60 0x001F    mov_r6 At<Register, 0>,
-:mov_r6    Register_0    is Register_0 & op_0515=0x2FB unimpl
+:mov_r6    Register_0    is Register_0 & op_0515=0x2FB
+{
+    # todo Handle other registers
+    r6 = Register_0;
+}
 
 # 0xD29C 0x0403    mov_memsp_r6 Unused<0>,Unused<1>,Unused<10>,
 :mov_memsp_r6        is Unused_0 & Unused_1 & Unused_10 & op_0209=0xA7 & op_1115=0x1A unimpl
